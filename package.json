@@ -1,13 +1,18 @@
 {
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "axios": "^0.25.0",
     "next": "latest",
+    "notion-client": "^4.15.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-notion-x": "^4.15.0",
+    "react-onclickoutside": "^6.12.1",
+    "styled-components": "^5.3.3"
   }
 }
