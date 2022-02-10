@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: datepop-career
+  namespace: datepop
+  labels:
+    app: datepop-career
+
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: datepop-career
+  template:
+    metadata:
+      labels:
+        app: datepop-career
+    spec:
+      containers:
+        - name: datepop-career
+          image: ''
+          ports:
+            - name: inbound
+              containerPort: 3000

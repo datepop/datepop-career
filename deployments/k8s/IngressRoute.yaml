@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+
+metadata:
+  name: ingress-route-datepop-career-web
+  namespace: traefik
+
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`career.datepop.co.kr`)
+      kind: Rule
+      services:
+        - namespace: datepop
+          name: datepop-career
+          port: 80
