@@ -79,7 +79,6 @@ const MobileMenu = styled.div`
   padding: 10px 0;
 
   animation: dropdown cubic-bezier(0.23, 1, 0.32, 1) 1;
-  opacity: 0.9;
   animation-fill-mode: forwards;
   animation-duration: 0.6s;
   box-shadow: 0 5px 5px rgba(0, 0, 0, .1);

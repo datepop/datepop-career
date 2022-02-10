@@ -32,7 +32,10 @@ export default function Home({ header, notion }) {
 }
 
 export function getStaticPaths() {
-  return { paths: [{ params: { page: 'career' } }], fallback: 'blocking' };
+  const paths = NAVBAR.filter(item => item.link !== '/').map(p => {
+    return { params: { page: p.link.slice(1, p.link.length) }};
+  })
+  return { paths, fallback: 'blocking' };
 }
 
 export const getStaticProps = async ({ params }) => {
@@ -52,7 +55,6 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: recordMap,
-    revalidate: 10 * 60,
+    revalidate: 60,
   };
-
 };
