@@ -32,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: $AWS_DEFAULT_REGION
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
       - name: Login ECR
         run: aws ecr get-login-password | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
@@ -40,16 +40,14 @@ jobs:
       - name: Build docker image
         run: docker build -t $IMAGE .
 
-      - name: Deploy <master>
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Deploy <main>
         run: |
           docker tag $IMAGE ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }}
           docker push ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }}
 
-      - name: Deploy <master>
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Deploy <main>
         uses: ladislas14/kubernetes-action@master
         with:
-          args: set image deployment/$IMAGE $IMAGE=${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }} -n datepop --record
+          args: set image deployment/${{ env.IMAGE }} ${{ env.IMAGE }}=${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }} -n datepop --record
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
