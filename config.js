@@ -3,7 +3,7 @@ export const NAVBAR = [
         "name": "데이트팝 소개",
         "link": "/",
         "notion": "https://10fingers.notion.site/0218fe3907364700811796a59f15ec3f",
-        "header": "데이트팝 채용",
+        "header": "데이트팝 소개",
     },
     {
         "name": "일하는 방식",

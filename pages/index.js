@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>{page.title}</title>
+        <title>{page.header}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
