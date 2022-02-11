@@ -30,3 +30,4 @@ export const NAVBAR = [
         "header": "데이트팝 채용공고",
     },
 ]
+export const NAVER_SITE_VERIFICATION = "d6847fa647ad2c98b995bac8c2b19dd8c1c1d40c";
