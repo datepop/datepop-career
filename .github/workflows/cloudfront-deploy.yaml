@@ -42,12 +42,12 @@ jobs:
 
       - name: Deploy <main>
         run: |
-          docker tag $IMAGE ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }}
-          docker push ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }}
+          docker tag $IMAGE ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.DEV }}
+          docker push ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.DEV }}
 
       - name: Deploy <main>
         uses: ladislas14/kubernetes-action@master
         with:
-          args: set image deployment/${{ env.IMAGE }} ${{ env.IMAGE }}=${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.VERSION }} -n datepop --record
+          args: set image deployment/${{ env.IMAGE }} ${{ env.IMAGE }}=${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.DEV }} -n datepop --record
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG }}
