@@ -1,4 +1,4 @@
-FROM node:12 AS BUILD_IMAGE
+FROM arm64v8/node:12 AS BUILD_IMAGE
 
 COPY [".", "/opt/source/"]
 
@@ -6,7 +6,7 @@ WORKDIR /opt/source/
 
 RUN npm install && npm run build
 
-FROM node:12-slim
+FROM arm64v8/node:12-slim
 
 COPY --from=BUILD_IMAGE /opt/source/package.json /opt/source/
 COPY --from=BUILD_IMAGE /opt/source/public /opt/source/public

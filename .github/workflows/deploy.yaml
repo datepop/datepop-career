@@ -1,0 +1,71 @@
+name: Deploy datepop-career
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ap-northeast-2
+  REPOSITORY_NAME: datepop-career
+  IMAGE: datepop-career
+  ECS_SERVICE_PRODUCTION: prod-datepop-career
+  ECS_CLUSTER_PRODUCTION: datepop-cluster-production-arm
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      
+      - name: Set Tag Version
+        id: tag
+        run: |
+          echo ::set-output name=VERSION::${GITHUB_REF#refs/*/}
+          echo ::set-output name=DEV::${GITHUB_REF#refs/*/}-${{ github.sha }}
+          echo ::set-output name=URL::$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+              role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/GithubActions
+              role-session-name: ${{ env.REPOSITORY_NAME }}
+              aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        run: aws ecr get-login-password | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com"
+
+      - name: Build docker image
+        run: docker build --platform linux/arm64 -t $REPOSITORY_NAME -f Dockerfile .
+
+      - name: Storage Deploy
+        run: |
+          docker tag $REPOSITORY_NAME ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.DEV }}
+          docker push ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.DEV }}
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-def.json
+          container-name: ${{ env.REPOSITORY_NAME }}
+          image: ${{ steps.tag.outputs.URL }}:${{ steps.tag.outputs.DEV }}
+
+      - name: Deploy <master> Amazon ECS task definition
+        if: ${{ endsWith(github.ref, 'main') }}
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE_PRODUCTION }}
+          cluster: ${{ env.ECS_CLUSTER_PRODUCTION }}
+          wait-for-service-stability: true
